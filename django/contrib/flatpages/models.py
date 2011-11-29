@@ -15,7 +15,7 @@ class FlatPage(models.Model):
     template_name = models.CharField(_('template name'), max_length=70, blank=True,
         help_text=_("Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use 'flatpages/default.html'."))
     registration_required = models.BooleanField(_('registration required'), help_text=_("If this is checked, only logged-in users will be able to view the page."))
-    sites = models.ManyToManyField(Site)
+    sites = models.ForeignKey(Site)
 
     class Meta:
         db_table = 'django_flatpage'
