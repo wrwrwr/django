@@ -103,7 +103,17 @@ class BaseSettings(object):
     """
     Common logic for settings whether set by a module or by the user.
     """
+    def __getattr__(self, name):
+        if name == "AUTOFIELD_TYPE":
+            return int
+        object.__getattr__(self, name)
+
     def __setattr__(self, name, value):
+        if name == "AUTOFIELD_TYPE":
+            if ("AUTOFIELD_TYPE" in self.__dict__ and
+                    not issubclass(value, self.AUTOFIELD_TYPE)):
+                warnings.warn("Incompatible AUTOFIELD_TYPEs; previous: %s, "
+                              "current: %s." % (self.AUTOFIELD_TYPE, value))
         if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
             raise ImproperlyConfigured("If set, %s must end with a slash" % name)
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
