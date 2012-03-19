@@ -118,6 +118,7 @@ class Group(models.Model):
     members-only portion of your site, or sending them members-only email
     messages.
     """
+    id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(_('name'), max_length=80, unique=True)
     permissions = models.ManyToManyField(Permission,
         verbose_name=_('permissions'), blank=True)
@@ -197,6 +198,7 @@ class UserManager(BaseUserManager):
 
 @python_2_unicode_compatible
 class AbstractBaseUser(models.Model):
+    id = models.PositiveIntegerField(primary_key=True)
     password = models.CharField(_('password'), max_length=128)
     last_login = models.DateTimeField(_('last login'), default=timezone.now)
 
