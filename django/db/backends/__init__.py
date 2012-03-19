@@ -893,15 +893,6 @@ class BaseDatabaseOperations(object):
         """
         return value
 
-    def value_to_db_auto(self, value):
-        """
-        Transform a value to an object compatible with the auto field required
-        by the backend driver for auto columns.
-        """
-        if value is None:
-            return None
-        return int(value)
-
     def value_to_db_date(self, value):
         """
         Transform a date value to an object compatible with what is expected
