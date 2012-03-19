@@ -540,11 +540,10 @@ class AutoField(Field):
     def to_python(self, value):
         if value is None:
             return value
-        try:
-            return int(value)
-        except (TypeError, ValueError):
-            msg = self.error_messages['invalid'] % value
+        if not isinstance(value, (basestring, int, long)):
+            msg = self.error_messages['invalid'] % str(value)
             raise exceptions.ValidationError(msg)
+        return value
 
     def validate(self, value, model_instance):
         pass
@@ -556,9 +555,13 @@ class AutoField(Field):
         return value
 
     def get_prep_value(self, value):
-        if value is None:
-            return None
-        return int(value)
+        return value
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        # Casts AutoField into the format expected by the backend
+        if not prepared:
+            value = self.get_prep_value(value)
+        return connection.ops.value_to_db_auto(value)
 
     def contribute_to_class(self, cls, name):
         assert not cls._meta.has_auto_field, \
