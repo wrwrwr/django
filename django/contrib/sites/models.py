@@ -55,6 +55,10 @@ class SiteManager(models.Manager):
 @python_2_unicode_compatible
 class Site(models.Model):
 
+    # Integer values are used in tests and suggested in documentation,
+    # so we should not use AutoField (which may not support ints).
+    id = models.PositiveIntegerField(primary_key=True)
+
     domain = models.CharField(_('domain name'), max_length=100,
         validators=[_simple_domain_name_validator])
     name = models.CharField(_('display name'), max_length=50)
