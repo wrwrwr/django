@@ -304,7 +304,7 @@ class PermissionsMixin(models.Model):
                                 'his/her group.'))
     user_permissions = models.ManyToManyField(Permission,
         verbose_name=_('user permissions'), blank=True,
-        help_text='Specific permissions for this user.')
+        help_text=_('Specific permissions for this user.'))
 
     class Meta:
         abstract = True
