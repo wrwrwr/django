@@ -283,7 +283,7 @@ def pgettext(context, message):
     result = ugettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        result = message
+        result = unicode(message)
     return result
 
 def gettext_noop(message):

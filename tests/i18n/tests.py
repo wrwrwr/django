@@ -152,6 +152,15 @@ class TranslationTests(TestCase):
             self.assertEqual(npgettext("search", "%d result", "%d results", 4) % 4, "4 Resultate")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
+    def test_pgettext_return_type(self):
+        """
+        Pgettext should consistently return unicode (even for a byte string
+        message without a translation).
+        """
+        self.assertIsInstance(pgettext("month name", b"May"), unicode)
+        self.assertIsInstance(pgettext("unexisting", b"unexisting"), unicode)
+
+    @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_template_tags_pgettext(self):
         """
         Ensure that message contexts are taken into account the {% trans %} and
