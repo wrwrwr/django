@@ -33,3 +33,14 @@ class PlainAppsConfig(AppConfig):
 class RelabeledAppsConfig(AppConfig):
     name = 'apps'
     label = 'relabeled'
+
+
+class NonreentrantApp(AppConfig):
+    name = 'apps'
+    ready_executed = False
+
+    def ready(self):
+        if NonreentrantApp.ready_executed:
+            raise NotImplementedError
+        else:
+            NonreentrantApp.ready_executed = True

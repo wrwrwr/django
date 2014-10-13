@@ -208,6 +208,15 @@ class AppsTests(TestCase):
             apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)
 
+    def test_set_installed_apps(self):
+        """
+        Checks that modifying installed apps does not execute ready for a
+        second time for already installed apps.
+        """
+        with override_settings(INSTALLED_APPS=['apps.apps.NonreentrantApp']):
+            with override_settings(INSTALLED_APPS=['apps.apps.NonreentrantApp']):
+                pass
+
 
 class Stub(object):
     def __init__(self, **kwargs):
