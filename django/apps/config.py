@@ -49,8 +49,8 @@ class AppConfig(object):
         # None to prevent accidental access before import_models() runs.
         self.models = None
 
-        # Used to prevent calling ready() more than once for a single AppConfig
-        # instance.
+        # Used to prevent calling ready() more than once for a single
+        # AppConfig instance.
         self.readied = False
 
     def __repr__(self):
