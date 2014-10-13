@@ -210,12 +210,23 @@ class AppsTests(TestCase):
 
     def test_set_installed_apps(self):
         """
-        Checks that modifying installed apps does not execute ready for a
-        second time for already installed apps.
+        Checks that modifying installed apps does not execute ``ready`` for a
+        second time for previously installed apps.
         """
         with override_settings(INSTALLED_APPS=['apps.apps.NonreentrantApp']):
             with override_settings(INSTALLED_APPS=['apps.apps.NonreentrantApp']):
                 pass
+        app_config = AppConfig.create('apps.apps.NonreentrantApp')
+        with override_settings(INSTALLED_APPS=[app_config]):
+            with override_settings(INSTALLED_APPS=[app_config]):
+                pass
+        app_config1 = AppConfig.create('apps.apps.NonreentrantApp')
+        app_config2 = AppConfig.create('apps.apps.NonreentrantApp')
+        with self.assertRaises(NotImplementedError):
+            # Ready should be called for each instance of an AppConfig.
+            with override_settings(INSTALLED_APPS=[app_config1]):
+                with override_settings(INSTALLED_APPS=[app_config2]):
+                    pass
 
 
 class Stub(object):
