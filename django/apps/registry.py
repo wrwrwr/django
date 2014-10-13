@@ -118,7 +118,9 @@ class Apps(object):
             self.models_ready = True
 
             for app_config in self.get_app_configs():
-                app_config.ready()
+                if not app_config.readied:
+                    app_config.ready()
+                    app_config.readied = True
 
             self.ready = True
 
