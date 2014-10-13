@@ -55,7 +55,7 @@ class Apps(object):
         if installed_apps is not None:
             self.populate(installed_apps)
 
-    def populate(self, installed_apps=None):
+    def populate(self, installed_apps=None, reuse_app_configs=False):
         """
         Loads application configurations and models.
 
@@ -83,6 +83,12 @@ class Apps(object):
                     app_config = entry
                 else:
                     app_config = AppConfig.create(entry)
+
+                    if reuse_app_configs:
+                        for stored_app_configs in self.stored_app_configs:
+                            if app_config.label in stored_app_configs:
+                                app_config = stored_app_configs[app_config.label]
+
                 if app_config.label in self.app_configs:
                     raise ImproperlyConfigured(
                         "Application labels aren't unique, "
@@ -313,7 +319,7 @@ class Apps(object):
         self.app_configs = OrderedDict()
         self.apps_ready = self.models_ready = self.ready = False
         self.clear_cache()
-        self.populate(installed)
+        self.populate(installed, reuse_app_configs=True)
 
     def unset_installed_apps(self):
         """
