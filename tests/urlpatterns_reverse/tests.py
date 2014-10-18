@@ -365,6 +365,23 @@ class ReverseShortcutTests(TestCase):
         self.assertEqual(res.url, '/headlines/2008.02.17/')
         self.assertRaises(NoReverseMatch, redirect, 'not-a-view')
 
+    @override_settings(LOGIN_URL='no.such.view')
+    def test_login_required(self):
+        # Note: the following test for redirect loops, asserts are not necessary.
+        self.client.get('/login_required/', follow=True)
+
+    def test_redirect_to_nonexistant(self):
+        self.client.get('/redirect_to_nonexistant/', follow=True)
+
+    def test_redirect_to_nonexistant_with_argument(self):
+        self.client.get('/redirect_to_nonexistant_with_argument/', follow=True)
+
+    def test_redirect_to_patternless(self):
+        self.client.get('/redirect_to_patternless/', follow=True)
+
+    def test_redirect_with_wrong_argument(self):
+        self.client.get('/redirect_with_wrong_argument/', follow=True)
+
     def test_redirect_to_url(self):
         res = redirect('/foo/')
         self.assertEqual(res.url, '/foo/')

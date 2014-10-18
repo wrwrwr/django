@@ -3,8 +3,9 @@ import warnings
 from django.conf.urls import patterns, url, include
 
 from .views import (
-    absolute_kwargs_view, defaults_view, empty_view, empty_view_partial,
-    empty_view_wrapped, nested_view,
+    absolute_kwargs_view, defaults_view, empty_view, empty_view_partial, empty_view_wrapped, nested_view,
+    login_required_view, redirect_to_nonexistant_view, redirect_to_nonexistant_with_argument_view,
+    redirect_to_patternless_view, redirect_with_wrong_argument_view, target_with_int_argument_view
 )
 
 
@@ -78,4 +79,12 @@ with warnings.catch_warnings(record=True):
 
         # Security tests
         url('(.+)/security/$', empty_view, name='security'),
+
+        # Note: the following login/redirect patterns are meant to end without a "$".
+        url(r'^login_required/', login_required_view),
+        url(r'^redirect_to_nonexistant/', redirect_to_nonexistant_view),
+        url(r'^redirect_to_nonexistant_with_argument/', redirect_to_nonexistant_with_argument_view),
+        url(r'^redirect_to_patternless/', redirect_to_patternless_view),
+        url(r'^redirect_with_wrong_argument/', redirect_with_wrong_argument_view),
+        url(r'^target_with_int_argument/(?P<number>[0-9]+)/$', target_with_int_argument_view),
     )

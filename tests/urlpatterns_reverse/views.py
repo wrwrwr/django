@@ -1,10 +1,11 @@
 from functools import partial, update_wrapper
+from random import random
 
-from django.http import HttpResponse
-from django.views.generic import RedirectView
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
-
-from django.contrib.auth.decorators import user_passes_test
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.views.generic import RedirectView
 
 
 def empty_view(request, *args, **kwargs):
@@ -65,3 +66,32 @@ empty_view_partial = partial(empty_view, template_name="template.html")
 empty_view_wrapped = update_wrapper(
     partial(empty_view, template_name="template.html"), empty_view,
 )
+
+
+@login_required
+def login_required_view(request):
+    return HttpResponse("Now, you're logged in, that's not funny!")
+
+
+def redirect_to_nonexistant_view(request):
+    return redirect('no.such.view')
+
+
+def redirect_to_nonexistant_with_argument_view(request):
+    return redirect('no.such.view?a=%s' % random())
+
+
+def target_without_pattern_view(request):
+    return HttpResponse("Just a fine view, but not linked in urls.py.")
+
+
+def redirect_to_patternless_view(request):
+    return redirect('urlpatterns_reverse.views.target_without_pattern_view')
+
+
+def target_with_int_argument_view(request, number):
+    return HttpResponse("Just a fine view that takes an integer argument.")
+
+
+def redirect_with_wrong_argument_view(request):
+    return redirect('urlpatterns_reverse.views.target_with_int_argument_view', number='a')
