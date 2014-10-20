@@ -4,12 +4,17 @@ from types import ModuleType
 import unittest
 import warnings
 
+from django.apps import apps
 from django.conf import LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import OperationalError
+from django.dispatch import Signal, receiver
 from django.http import HttpRequest
 from django.test import (SimpleTestCase, TransactionTestCase, TestCase,
     modify_settings, override_settings, signals)
 from django.utils import six
+
+from .parent_app.models import Parent
 
 
 @modify_settings(ITEMS={
@@ -137,6 +142,57 @@ class ChildDecoratedTestCase(ParentDecoratedTestCase):
     def test_override_settings_inheritance(self):
         self.assertEqual(settings.ITEMS, ['father', 'mother', 'child'])
         self.assertEqual(settings.TEST, 'override-child')
+
+
+@modify_settings(INSTALLED_APPS={'append': 'settings_tests.parent_app'})
+class InstalledAppsOverrideTestCase(TestCase):
+    """
+    Modifying ``INSTALLED_APPS`` requires some magic.
+    """
+    def test_forward_migration(self):
+        """
+        When apps are loaded their migrations are run on the test database.
+        """
+        Parent.objects.create()
+
+    @modify_settings(INSTALLED_APPS={'remove': 'settings_tests.parent_app'})
+    def test_backward_migration(self):
+        """
+        When apps are unloaded their migrations are run backwards.
+        """
+        with self.assertRaises(OperationalError):
+            Parent.objects.create()
+
+    def test_related(self):
+        """
+        When new models with foreign keys to existing models are loaded,
+        new related sets are created.
+        """
+        parent = Parent.objects.create()
+        parent.child_set.create()  # Ensure related cache population.
+
+        with modify_settings(INSTALLED_APPS={'append': 'settings_tests.child_app'}):
+            parent.bastard_set.create()
+
+    def test_signals(self):
+        """
+        Signals registered with an app sender don't get "disconnected" on
+        changing ``INSTALLED_APPS``.
+        """
+        some_signal = Signal()
+
+        class Nonlocal():
+            pass
+        n = Nonlocal()
+        n.handler_called = False
+
+        @receiver(some_signal, sender=apps.get_app_config('parent_app'))
+        def signal_handler(sender, **kwargs):
+            n.handler_called = True
+
+        with self.modify_settings(INSTALLED_APPS={}):
+            some_signal.send(apps.get_app_config('parent_app'))
+        self.assertTrue(n.handler_called, "signal handler did not execute")
 
 
 class SettingsTests(TestCase):
