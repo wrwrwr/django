@@ -85,11 +85,30 @@ def assert_and_parse_html(self, html, user_msg, msg):
     return dom
 
 
+def clear_query_caches():
+    """
+    Resets all caches that may prevent query execution.
+
+    Needed to ensure deterministic behavior of ``assertNumQueries`` (or
+    after external changes to some Django database records).
+    """
+    from django.contrib.contenttypes.models import ContentType
+    from django.contrib.sites.models import Site
+    ContentType.objects.clear_cache()
+    Site.objects.clear_cache()
+
+
 class _AssertNumQueriesContext(CaptureQueriesContext):
-    def __init__(self, test_case, num, connection):
+    def __init__(self, test_case, num, connection, clear_caches=True):
         self.test_case = test_case
         self.num = num
+        self.clear_caches = clear_caches
         super(_AssertNumQueriesContext, self).__init__(connection)
+
+    def __enter__(self):
+        if self.clear_caches:
+            clear_query_caches()
+        return super(_AssertNumQueriesContext, self).__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
         super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
@@ -883,8 +902,9 @@ class TransactionTestCase(SimpleTestCase):
     def assertNumQueries(self, num, func=None, *args, **kwargs):
         using = kwargs.pop("using", DEFAULT_DB_ALIAS)
         conn = connections[using]
+        clear_caches = kwargs.pop("clear_caches", True)
 
-        context = _AssertNumQueriesContext(self, num, conn)
+        context = _AssertNumQueriesContext(self, num, conn, clear_caches=clear_caches)
         if func is None:
             return context
 

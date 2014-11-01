@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import unittest
 
 from django.conf.urls import url
+from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import default_storage
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import connection
@@ -138,6 +139,13 @@ class AssertNumQueriesTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
             self.client.get("/test_utils/get_person/%s/" % person.pk)
         self.assertNumQueries(2, test_func)
+
+    def test_query_caches_clearing(self):
+        ContentType.objects.get_for_model(Car)
+        with self.assertNumQueries(1):
+            ContentType.objects.get_for_model(Car)
+        with self.assertNumQueries(0, clear_caches=False):
+            ContentType.objects.get_for_model(Car)
 
 
 class AssertQuerysetEqualTests(TestCase):
