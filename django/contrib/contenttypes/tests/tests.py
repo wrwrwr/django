@@ -26,37 +26,37 @@ class ContentTypesTests(TestCase):
         """
 
         # At this point, a lookup for a ContentType should hit the DB
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(1, clear_caches=False):
             ContentType.objects.get_for_model(ContentType)
 
         # A second hit, though, won't hit the DB, nor will a lookup by ID
         # or natural key
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(0, clear_caches=False):
             ct = ContentType.objects.get_for_model(ContentType)
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(0, clear_caches=False):
             ContentType.objects.get_for_id(ct.id)
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(0, clear_caches=False):
             ContentType.objects.get_by_natural_key('contenttypes',
                                                    'contenttype')
 
         # Once we clear the cache, another lookup will again hit the DB
         ContentType.objects.clear_cache()
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(1, clear_caches=False):
             ContentType.objects.get_for_model(ContentType)
 
         # The same should happen with a lookup by natural key
         ContentType.objects.clear_cache()
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(1, clear_caches=False):
             ContentType.objects.get_by_natural_key('contenttypes',
                                                    'contenttype')
         # And a second hit shouldn't hit the DB
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(0, clear_caches=False):
             ContentType.objects.get_by_natural_key('contenttypes',
                                                    'contenttype')
 
     def test_get_for_models_empty_cache(self):
         # Empty cache.
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(1, clear_caches=False):
             cts = ContentType.objects.get_for_models(ContentType, FooWithUrl)
         self.assertEqual(cts, {
             ContentType: ContentType.objects.get_for_model(ContentType),
@@ -66,7 +66,7 @@ class ContentTypesTests(TestCase):
     def test_get_for_models_partial_cache(self):
         # Partial cache
         ContentType.objects.get_for_model(ContentType)
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(1, clear_caches=False):
             cts = ContentType.objects.get_for_models(ContentType, FooWithUrl)
         self.assertEqual(cts, {
             ContentType: ContentType.objects.get_for_model(ContentType),
@@ -77,7 +77,7 @@ class ContentTypesTests(TestCase):
         # Full cache
         ContentType.objects.get_for_model(ContentType)
         ContentType.objects.get_for_model(FooWithUrl)
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(0, clear_caches=False):
             cts = ContentType.objects.get_for_models(ContentType, FooWithUrl)
         self.assertEqual(cts, {
             ContentType: ContentType.objects.get_for_model(ContentType),
