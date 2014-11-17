@@ -72,6 +72,7 @@ Imports
   For example::
 
         from __future__ import nested_scopes
+
         import concurrent.futures
         import turtle
 
