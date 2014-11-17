@@ -60,9 +60,9 @@ Imports
       from django.views.generic.base import View
 
 * Put imports in three groups: standard library, other Django packages, the
-  same package, as recommended by PEP; sort lines in each group alphabetically
-  by the full module name. Place ``import module`` statements after
-  ``from module import objects``.
+  same package, as recommended by :pep:`8`; sort lines in each group
+  alphabetically by the full module name. Place ``import module`` statements
+  after ``from module import objects``.
 
 * On each line, list imported modules first, then classes, and then other
   objects also ordering each group alphabetically, with upper case before
