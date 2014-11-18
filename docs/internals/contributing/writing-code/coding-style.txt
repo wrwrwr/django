@@ -71,9 +71,9 @@ Imports
 * Break long lines using parentheses, indenting continuation lines by 4 spaces.
   For example::
 
-        from __future__ import nested_scopes
+        from __future__ import unicode_literals
 
-        import concurrent.futures
+        import email.message
         import turtle
 
         from django.contrib.messages import MessageFailure, ERROR, error
