@@ -59,8 +59,8 @@ Imports
 
       from django.views.generic.base import View
 
-* Put imports in three groups: standard library, other Django packages, the
-  same package, as recommended by :pep:`8`; sort lines in each group
+* Put imports in five groups: future, standard library, third-party libraries,
+  other Django components, the same component; sort lines in each group
   alphabetically by the full module name. Place ``import module`` statements
   after ``from module import objects``.
 
@@ -75,6 +75,8 @@ Imports
 
         import email.message
         import turtle
+
+        import bcrypt
 
         from django.contrib.messages import MessageFailure, ERROR, error
         from django.db import (models, transaction, DataError, DatabaseError, Error, IntegrityError,
