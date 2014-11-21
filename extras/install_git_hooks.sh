@@ -5,7 +5,7 @@
 # Hooks that are to be installed; a {destination: source} dictionary
 # with base names of files.
 declare -A hooks=(
-    ['pre-commit']='run_all.sh'
+    ['pre-commit']='run_all.py'
     ['pre-commit-flake8']='flake8_changed.py')
 
 # Where are the source files and where should they be linked from.
