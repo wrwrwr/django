@@ -5,10 +5,10 @@ import turtle
 
 import bcrypt
 
-from django.contrib.messages import MessageFailure, ERROR, error
-from django.db import (models, transaction, DataError, DatabaseError, Error, IntegrityError,
-    InterfaceError, InternalError, NotSupportedError, OperationalError, ProgrammingError,
-    DEFAULT_DB_ALIAS, connections)
 import django.core.management.commands.flush
+from django.contrib.messages import ERROR, MessageFailure, error
+from django.db import (
+    DEFAULT_DB_ALIAS, DatabaseError, DataError, Error, IntegrityError, InterfaceError, InternalError,
+    NotSupportedError, OperationalError, ProgrammingError, connections, models, transaction)
 
 from .cookie import Morsel
