@@ -6,7 +6,8 @@
 # with base names of files.
 declare -A hooks=(
     ['pre-commit']='run_all.py'
-    ['pre-commit-flake8']='flake8_changed.py')
+    ['pre-commit-flake8']='flake8_changed.py'
+    ['pre-commit-isort']='isort_changed.py')
 
 # Where are the source files and where should they be linked from.
 src_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/git_hooks/"
