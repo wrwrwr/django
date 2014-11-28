@@ -12,7 +12,6 @@ import django
 from django import contrib
 from django.apps import apps
 from django.conf import settings
-from django.db import connection
 from django.test import TransactionTestCase, TestCase
 from django.test.utils import get_runner
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
@@ -65,10 +64,6 @@ def get_test_modules():
         (None, RUNTESTS_DIR),
         (CONTRIB_MODULE_PATH, CONTRIB_DIR)
     ]
-    if connection.features.gis_enabled:
-        discovery_paths.append(
-            ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
-        )
 
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
@@ -77,8 +72,6 @@ def get_test_modules():
                     os.path.basename(f) in SUBDIRS_TO_SKIP or
                     os.path.isfile(f) or
                     not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
-                continue
-            if not connection.vendor == 'postgresql' and f == 'postgres_tests' or f == 'postgres':
                 continue
             modules.append((modpath, f))
     return modules

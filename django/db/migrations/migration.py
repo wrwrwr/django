@@ -74,7 +74,7 @@ class Migration(object):
         """
         Checks if this migration may be applied on the connection's backend.
         """
-        return self.vendors == '__all__' or connection.vendor in self.vendors
+        return self.vendors == '__all__' or (connection is not None and connection.vendor in self.vendors)
 
     def mutate_state(self, project_state):
         """
