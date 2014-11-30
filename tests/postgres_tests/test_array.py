@@ -228,6 +228,7 @@ class TestMigrations(TestCase):
         new = ArrayField(*args, **kwargs)
         self.assertEqual(new.base_field.max_length, field.base_field.max_length)
 
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
     @override_settings(MIGRATION_MODULES={
         "postgres_tests": "postgres_tests.array_default_migrations",
     })
