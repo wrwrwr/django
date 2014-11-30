@@ -10,6 +10,7 @@ class Migration(object):
     and subclass it as a class called Migration. It will have one or more
     of the following attributes:
 
+     - backends: A list of backend names that the migration applies to, '__all__' on default
      - operations: A list of Operation instances, probably from django.db.migrations.operations
      - dependencies: A list of tuples of (app_path, migration_name)
      - run_before: A list of tuples of (app_path, migration_name)
@@ -18,6 +19,9 @@ class Migration(object):
     Note that all migrations come out of migrations and into the Loader or
     Graph as instances, having been initialized with their app label and name.
     """
+
+    # On what backends can the migration be applied.
+    vendors = '__all__'
 
     # Operations to apply during this migration, in order.
     operations = []
@@ -65,6 +69,12 @@ class Migration(object):
 
     def __hash__(self):
         return hash("%s.%s" % (self.app_label, self.name))
+
+    def allowed_for_connection(self, connection):
+        """
+        Checks if this migration may be applied on the connection's backend.
+        """
+        return self.vendors == '__all__' or connection.vendor in self.vendors
 
     def mutate_state(self, project_state):
         """

@@ -8,6 +8,10 @@ import django.contrib.postgres.fields.hstore
 
 class Migration(migrations.Migration):
 
+    vendors = [
+        'postgres'
+    ]
+
     dependencies = [
         ('postgres_tests', '0001_setup_extensions'),
     ]

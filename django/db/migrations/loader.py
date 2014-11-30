@@ -85,7 +85,6 @@ class MigrationLoader(object):
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
                     six.moves.reload_module(module)
-            self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py files
             migration_names = set()
@@ -113,7 +112,15 @@ class MigrationLoader(object):
                 if hasattr(migration_module.Migration, "forwards"):
                     south_style_migrations = True
                     break
-                self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(migration_name, app_config.label)
+                # Skip migrations for different databases.
+                migration = migration_module.Migration(migration_name, app_config.label)
+                if migration.allowed_for_connection(self.connection):
+                    self.disk_migrations[app_config.label, migration_name] = migration
+                    self.migrated_apps.add(app_config.label)
+                else:
+                    print("Skipping migration not suitable for the current backend: %s" % migration)
+            # TODO: Add to unmigrated if there are some migrations,
+            #       but none for the current backend?
             if south_style_migrations:
                 self.unmigrated_apps.add(app_config.label)
 
