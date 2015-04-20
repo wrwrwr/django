@@ -398,13 +398,19 @@ class QuerySet(object):
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
+        # Generating the arguments string may cause an exception, for instance
+        # if stringifying an argument would issue the same query; see #20278.
+        try:
+            kwargs_string = "Lookup arguments were %s." % kwargs
+        except:
+            kwargs_string = "Could not determine lookup arguments."
         if not num:
             raise self.model.DoesNotExist(
-                "%s matching query does not exist." %
-                self.model._meta.object_name)
+                "%s matching query does not exist. %s" %
+                        (self.model._meta.object_name, kwargs_string))
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s!" %
-            (self.model._meta.object_name, num))
+            "get() returned more than one %s -- it returned %s! %s" %
+                    (self.model._meta.object_name, num, kwargs_string))
 
     def create(self, **kwargs):
         """
